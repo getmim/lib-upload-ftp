@@ -30,9 +30,6 @@ return [
                 'lib-ftp-ssh' => NULL
             ],
             [
-                'lib-compress' => NULL
-            ],
-            [
                 'lib-media' => NULL
             ]
         ]
@@ -46,10 +43,6 @@ return [
             'LibUploadFtp\\Keeper' => [
                 'type' => 'file',
                 'base' => 'modules/lib-upload-ftp/keeper'
-            ],
-            'LibUploadFtp\\Model' => [
-                'type' => 'file',
-                'base' => 'modules/lib-upload-ftp/model'
             ]
         ],
         'files' => []

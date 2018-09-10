@@ -7,10 +7,7 @@
 
 namespace LibUploadFtp\Handler;
 
-use \claviska\SimpleImage;
-use \LibCompress\Library\Compressor;
 use \LibUpload\Model\Media;
-use \LibUploadFtp\Model\MediaFtp;
 
 class Ftp implements \LibMedia\Iface\Handler
 {
