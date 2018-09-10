@@ -35,21 +35,7 @@ class Ftp implements \LibUpload\Iface\Keeper
 
         return $ftp->upload($ftp_path, $file->source, 'binary', 0);
     }
-
-    static function get(object $file): ?object{
-        $config = \Mim::$app->config->libUploadFtp;
-
-        $result = (object)[
-            'path' => '',
-            'compress' => 'none'
-        ];
-
-        if(!isset($file->size) && !isset($file->compress))
-            $result->path = chop($config->url, '/') . '/' . ltrim($file->path, '/');
-
-        return $result;
-    }
-
+    
     static function lastError(): ?string{
         return self::$error;
     }

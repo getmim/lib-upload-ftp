@@ -1,7 +1,8 @@
 # lib-upload-ftp
 
-Adalah module yang memungkinkan aplikasi menyimpan file upload ke ftp server. Untuk dukungan
-koneksi dengan ssh ( sftp ), pastikan meng-install module `lib-ftp-ssh`.
+Adalah module yang memungkinkan aplikasi menyimpan file upload ke ftp server.
+Untuk dukungan koneksi dengan ssh ( sftp ), pastikan meng-install module
+`lib-ftp-ssh`.
 
 ## Instalasi
 
@@ -69,10 +70,8 @@ Untuk menggunakan library ini sebagai handler utama di front-end, tambahkan juga
 di bawah:
 
 ```php
-    'libUpload' => [
-        'keeper' => [
-            'handler' => 'ftp'
-        ]
+    'libMedia' => [
+        'handler' => 'LibUploadFtp\\Handler\\Ftp'
     ]
 ```
 

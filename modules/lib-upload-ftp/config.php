@@ -2,7 +2,7 @@
 
 return [
     '__name' => 'lib-upload-ftp',
-    '__version' => '0.0.1',
+    '__version' => '0.0.2',
     '__git' => 'git@github.com:getmim/lib-upload-ftp.git',
     '__license' => 'MIT',
     '__author' => [
@@ -20,19 +20,36 @@ return [
             ],
             [
                 'lib-ftp' => NULL
+            ],
+            [
+                'lib-model' => NULL
             ]
         ],
         'optional' => [
             [
                 'lib-ftp-ssh' => NULL
+            ],
+            [
+                'lib-compress' => NULL
+            ],
+            [
+                'lib-media' => NULL
             ]
         ]
     ],
     'autoload' => [
         'classes' => [
+            'LibUploadFtp\\Handler' => [
+                'type' => 'file',
+                'base' => 'modules/lib-upload-ftp/handler'
+            ],
             'LibUploadFtp\\Keeper' => [
                 'type' => 'file',
                 'base' => 'modules/lib-upload-ftp/keeper'
+            ],
+            'LibUploadFtp\\Model' => [
+                'type' => 'file',
+                'base' => 'modules/lib-upload-ftp/model'
             ]
         ],
         'files' => []
@@ -42,14 +59,14 @@ return [
             'handlers' => [
                 'ftp' => [
                     'class' => 'LibUploadFtp\\Keeper\\Ftp',
-                    'use' => true
+                    'use' => TRUE
                 ]
             ]
         ]
     ],
     'libUploadFtp' => [
         'base' => '',
-        'host' => null,
+        'host' => NULL,
         'connection' => []
     ]
 ];
