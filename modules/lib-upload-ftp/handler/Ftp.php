@@ -14,11 +14,6 @@ use \LibUploadFtp\Model\MediaFtp;
 
 class Ftp implements \LibMedia\Iface\Handler
 {
-    private static function compress(object $result): object{
-        if(!module_exists('lib-compress'))
-            return $result;
-        return $result;
-    }
 
     static function get(object $opt): ?object {
         $config = &\Mim::$app->config->libUploadFtp;
@@ -34,17 +29,41 @@ class Ftp implements \LibMedia\Iface\Handler
         $url_base   = chop($config->url, '/');
         $is_image   = fnmatch('image/*', $file_mime);
 
+        $url_file   = $url_base . '/' . $opt->file;
+
         $result = (object)[
-            'file' => $opt->file,
-            'base' => $file_abs,
-            'none' => $url_base . '/' . $opt->file
+            'none' => $url_file
         ];
 
-        deb('This feaure is not implemented');
-
         if(!$is_image)
-            return self::compress($result);
+            return $result;
 
-        deb($result);
+        $result->size = (object)[
+            'width'  => $media->width,
+            'height' => $media->height
+        ];
+        $result->webp = $url_file . '.webp';
+
+        if(!isset($opt->size))
+            return $result;
+
+        $t_width = $opt->size->width ?? null;
+        $t_height= $opt->size->height ?? null;
+
+        if(!$t_width)
+            $t_width = ceil($media->width * $t_height / $media->height);
+        if(!$t_height)
+            $t_height = ceil($media->height * $t_width / $media->width);
+
+        if($t_width == $media->width && $t_height == $media->height)
+            return $result;
+
+        $suffix   = '_' . $t_width . 'x' . $t_height;
+        $url_file = preg_replace('!\.[a-zA-Z]+$!', $suffix . '$0', $url_file);
+
+        $result->none = $url_file;
+        $result->webp = $url_file . '.webp';
+
+        return $result;
     }
 }

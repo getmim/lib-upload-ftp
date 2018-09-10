@@ -77,3 +77,18 @@ di bawah:
 
 Dengan konfigurasi seperti ini, maka setiap kali file akan digunakan di front-end, maka file dari ftp
 akan digunakan.
+
+## Server
+
+Module ini tidak menghandle resize dan compresi file, server ftp harus menyediakan file-file yang
+dibutuhkan pada saat request terjadi dengan spesifikasi sebagai berikut:
+
+1. `dir/dir/dir/filename.ext` Mengembalikan original file.
+1. `dir/dir/dir/filename.ext.webp` Mengembalikan file gambar dengan format webp.
+1. `dir/dir/dir/filename_{width}x{height}.ext` Mengembalikan file gambar dengan format original
+dengan ukuran gambar lebar `{width}` dan tinggi `{height}`.
+1. `dir/dir/dir/filename_{width}x{height}.ext.webp` Mengembalikan file gambar dengan format webp
+dengan ukuran gambar lebar `{width}` dan tinggi `{height}`.
+
+Untuk response dengan original format, sangat disarankan mengembalikan dengan compresi `brotli` jika
+memungkinkan dan `gzip` sebagai alternative.
