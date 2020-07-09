@@ -2,7 +2,7 @@
 
 return [
     '__name' => 'lib-upload-ftp',
-    '__version' => '0.0.2',
+    '__version' => '0.0.3',
     '__git' => 'git@github.com:getmim/lib-upload-ftp.git',
     '__license' => 'MIT',
     '__author' => [
@@ -61,5 +61,10 @@ return [
         'base' => '',
         'host' => NULL,
         'connection' => []
+    ],
+    'libMedia' => [
+        'handlers' => [
+            'aws' => 'LibUploadFtp\\Handler\\Ftp'
+        ]
     ]
 ];
