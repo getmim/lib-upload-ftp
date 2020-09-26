@@ -7,60 +7,53 @@
 
 namespace LibUploadFtp\Handler;
 
-use \LibUpload\Model\Media;
+use LibFtp\Library\Connect;
+use LibUploadFtp\Keeper\Ftp as _Ftp;
 
 class Ftp implements \LibMedia\Iface\Handler
 {
+    static function getPath(string $url): ?string{
+        $config = \Mim::$app->config->libUploadFtp;
+        $host = $config->url;
+        $host_len = strlen($host);
 
-    static function get(object $opt): ?object {
-        $config = &\Mim::$app->config->libUploadFtp;
-        $base = $config->base;
+        if(substr($url, 0, $host_len) != $host)
+            return null;
+        return substr($url, $host_len);
+    }
 
-        $file_abs = $base . '/' . $opt->file;
+    static function getLocalPath(string $path): ?string{
+        $config = \Mim::$app->config->libUploadFtp;
+        $copts  = $config->connection ?? null; 
+        if(!$copts)
+            trigger_error('No FTP connection for file upload found');
 
-        $media = Media::getOne(['path'=>$opt->file]);
-        if(!$media)
+        $copts->server = (array)$copts->server;
+        $copts->user = (array)$copts->user;
+
+        $copts = (array)$copts;
+
+        $ftp_path = $config->base ?? '';
+        $ftp_path.= '/' . $path;
+
+        $ftp = new Connect($copts);
+        if($ftp->getError())
             return null;
 
-        $file_mime  = $media->mime;
-        $url_base   = chop($config->url, '/');
-        $is_image   = fnmatch('image/*', $file_mime);
+        $local_path = tempnam(sys_get_temp_dir(), 'mim-lib-upload-ftp');
 
-        $url_file   = $url_base . '/' . $opt->file;
+        $ftp->download($ftp_path, $local_path, 'binary', 0);
+        return $local_path;
+    }
 
-        $result = (object)[
-            'none' => $url_file
-        ];
+    static function isLazySizer(string $path, int $width=null, int $height=null, string $compress=null): ?string{
+        return null;
+    }
 
-        if(!$is_image)
-            return $result;
-
-        $result->size = (object)[
-            'width'  => $media->width,
-            'height' => $media->height
-        ];
-        $result->webp = $url_file . '.webp';
-
-        if(!isset($opt->size))
-            return $result;
-
-        $t_width = $opt->size->width ?? null;
-        $t_height= $opt->size->height ?? null;
-
-        if(!$t_width)
-            $t_width = ceil($media->width * $t_height / $media->height);
-        if(!$t_height)
-            $t_height = ceil($media->height * $t_width / $media->width);
-
-        if($t_width == $media->width && $t_height == $media->height)
-            return $result;
-
-        $suffix   = '_' . $t_width . 'x' . $t_height;
-        $url_file = preg_replace('!\.[a-zA-Z]+$!', $suffix . '$0', $url_file);
-
-        $result->none = $url_file;
-        $result->webp = $url_file . '.webp';
-
-        return $result;
+    static function upload(string $local, string $name): ?string{
+        return _Ftp::save((object)[
+            'target' => $name,
+            'source' => $local
+        ]);
     }
 }

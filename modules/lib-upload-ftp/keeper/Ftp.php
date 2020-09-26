@@ -13,7 +13,17 @@ class Ftp implements \LibUpload\Iface\Keeper
 {
     private static $error;
 
-    static function save(object $file): bool{
+    static function getId(string $file): ?string{
+        $config = \Mim::$app->config->libUploadFtp;
+        $host = $config->url;
+        $host_len = strlen($host);
+
+        if(substr($file, 0, $host_len) != $host)
+            return null;
+        return substr($file, $host_len);
+    }
+
+    static function save(object $file): ?string{
         $config = \Mim::$app->config->libUploadFtp;
         $copts = $config->connection ?? null;
         if(!$copts)
@@ -33,7 +43,12 @@ class Ftp implements \LibUpload\Iface\Keeper
         $ftp_path = $config->base ?? '';
         $ftp_path.= '/' . $file->target;
 
-        return $ftp->upload($ftp_path, $file->source, 'binary', 0);
+        if(!$ftp->upload($ftp_path, $file->source, 'binary', 0))
+            return self::$setError($ftp->getError());
+
+        $final_url = $config->url . $file->target;
+
+        return $final_url;
     }
     
     static function lastError(): ?string{
