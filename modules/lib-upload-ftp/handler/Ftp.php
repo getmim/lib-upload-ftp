@@ -12,6 +12,8 @@ use LibUploadFtp\Keeper\Ftp as _Ftp;
 
 class Ftp implements \LibMedia\Iface\Handler
 {
+    private static $last_local_file;
+
     static function getPath(string $url): ?string{
         $config = \Mim::$app->config->libUploadFtp;
         $host = $config->url;
@@ -40,9 +42,13 @@ class Ftp implements \LibMedia\Iface\Handler
         if($ftp->getError())
             return null;
 
-        $local_path = tempnam(sys_get_temp_dir(), 'mim-lib-upload-ftp');
+        $local_path = tempnam(sys_get_temp_dir(), 'mim-lib-upload-ftp-');
 
-        $ftp->download($ftp_path, $local_path, 'binary', 0);
+        if(!$ftp->download($ftp_path, $local_path, 'binary', 0))
+            return null;
+
+        self::$last_local_file = $local_path;
+
         return $local_path;
     }
 
@@ -51,6 +57,9 @@ class Ftp implements \LibMedia\Iface\Handler
     }
 
     static function upload(string $local, string $name): ?string{
+        if(self::$last_local_file && is_file(self::$last_local_file))
+            unlink(self::$last_local_file);
+        
         return _Ftp::save((object)[
             'target' => $name,
             'source' => $local
